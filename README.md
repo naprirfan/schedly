@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Schedly Scheduler Concept (Offline-First)
+A high-performance, offline-first appointment scheduling system built to demonstrate advanced React patterns, local data persistence, and secure state management.
 
-## Getting Started
+## Architectural Highlights
+This project was built to showcase React capabilities, focusing on data integrity and rendering performance—critical for healthcare practice management.
 
-First, run the development server:
+1. Offline-First with IndexedDB
+Instead of treating local storage as a secondary cache, this system uses IndexedDB as the primary source of truth.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Reliability: Practitioners can continue taking treatment notes during internet outages.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Performance: Zero-latency data retrieval for a "snappy" UI.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. Cross-Tab Synchronization (Broadcast Channel API)
+To prevent data loss in multi-tab environments, I implemented a synchronization layer using the Broadcast Channel API.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+When an appointment is updated in Tab A, Tab B and C are notified instantly to invalidate their local state and re-sync from IndexedDB, preventing "Last Write Wins" conflicts.
 
-## Learn More
+3. Secure-by-Design Persistence
+Understanding the sensitivity of medical data:
 
-To learn more about Next.js, take a look at the following resources:
+All "Treatment Notes" are encrypted using the Web Crypto API (AES-GCM) before being persisted to disk.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Encryption keys are derived via PBKDF2 and held only in memory, ensuring that data remains unreadable if the physical device is compromised and the session is closed.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Rendering Efficiency
+Virtualized Grid: The calendar uses row/column virtualization to handle hundreds of overlapping appointments without degrading DOM performance.
 
-## Deploy on Vercel
+Optimistic UI: State updates are applied instantly with a robust rollback mechanism using custom hooks (useOptimisticTransaction).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stack
+- Framework: Next.js 15 (App Router)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Language: TypeScript (Strict Mode)
+
+- Storage: IndexedDB (via idb wrapper)
+
+- State Management: Zustand + Custom Hooks
+
+- Styling: Tailwind CSS
+
+## Key Components & Patterns
+`useBroadcastSync`: Custom hook managing the message bus between browser contexts.
+
+`AppointmentStore`: Centralized logic for handling IndexedDB transactions and state reconciliation.
+
+`CryptoService`: Abstraction layer for native Web Crypto APIs.
