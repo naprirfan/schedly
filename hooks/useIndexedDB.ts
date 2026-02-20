@@ -1,11 +1,6 @@
 import { DB_NAME } from '@/services/idbService';
+import { Patient } from '@/types/db';
 import { openDB } from 'idb';
-
-export interface Patient {
-    id: string;
-    name: string;
-    version: number;
-}
 
 export const initDB = async () => {
     return openDB(DB_NAME, 1, {
@@ -26,7 +21,7 @@ export const seedDatabase = async () => {
         { id: '3', name: 'Jane Smith', version: 1 },
     ];
     const tx = db.transaction('patients', 'readwrite');
-    
+
     for (const p of patients) await tx.store.put(p);
     await tx.done;
 };

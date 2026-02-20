@@ -1,8 +1,9 @@
+import { Patient } from '@/types/db';
 import { useState, useEffect, useMemo } from 'react';
 
 export const PatientSearch = () => {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<Patient[]>([]);
 
     // Persistent worker instance
     const worker = useMemo(() => 
@@ -21,4 +22,18 @@ export const PatientSearch = () => {
 
         return () => clearTimeout(timeoutId);
     }, []);
+
+    return (
+        <div className="p-4 border-b">
+            <input 
+                type="text" 
+                placeholder="Search patients (e.g. 'Jo')..."
+                className="w-full p-2 border rounded shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                onChange={(e) => setQuery(e.target.value)}
+            />
+            <ul className="mt-2 space-y-1">
+                {results.map(p => <li key={p.id} className="text-sm p-1 hover:bg-gray-100">{p.name}</li>)}
+            </ul>
+        </div>
+    )
 }

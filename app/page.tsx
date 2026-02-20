@@ -1,7 +1,5 @@
-import { Scheduler } from "@/components/Calendar/Scheduler";
+import HomePage from "@/components/HomePage";
 
 export default function Home() {
-  return (
-    <Scheduler />
-  )
+  return <HomePage />
 }
