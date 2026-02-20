@@ -6,6 +6,7 @@ type ListenersType = Array<() => void>;
 
 // Simple bus to trigger re-renders accross tabs
 let listeners: ListenersType = [];
+let snapshot = Date.now().toString(); // Our "cache"
 
 const broadcastChannel = typeof window !== 'undefined'
     ? new BroadcastChannel(CHANNEL_NAME)
@@ -13,9 +14,12 @@ const broadcastChannel = typeof window !== 'undefined'
 
 if (broadcastChannel) {
     broadcastChannel.onmessage = (event) => {
-        console.log('Syncing tabs due to:', event.data);
-        listeners.forEach(l => l());
-    }
+        // 2. Update the snapshot ONLY when a message arrives
+        snapshot = Date.now().toString();
+        
+        // 3. Notify React to re-render
+        listeners.forEach((l) => l());
+    };
 }
 
 export const useBroadcastSync = () => {
@@ -28,14 +32,14 @@ export const useBroadcastSync = () => {
     }
 
     // 2. Snapshot logic. Return timestamp just to force react to see a change
-    const getSnapshot = () => {
-        return Date.now().toString();
-    };
+    const getSnapshot = () => snapshot;
 
     // 3. Notify function. This function "event" got fired whenever we write to IndexedDB
     const notifyOthers = (actionType: string) => {
         if (broadcastChannel) {
+            snapshot = Date.now().toString();
             broadcastChannel.postMessage(actionType);
+            listeners.forEach((l) => l());
         }
     }
 

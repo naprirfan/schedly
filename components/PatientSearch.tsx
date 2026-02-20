@@ -9,7 +9,7 @@ export const PatientSearch = () => {
 
     // Persistent worker instance
     const worker = useMemo(() => 
-        typeof window !== 'undefined' ? new Worker('/worker/search-worker.js') : null
+        typeof window !== 'undefined' ? new Worker('/worker/patient-search-worker.js') : null
     , []);
 
     useEffect(() => {
