@@ -1,7 +1,7 @@
 import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
 
 const DB_NAME = 'schedly_offline_db';
-const DB_VERSION = 6;
+const DB_VERSION = 11;
 
 const DB_STORES = {
     PATIENTS: 'patients',
@@ -11,16 +11,15 @@ const DB_STORES = {
 
 self.onmessage = async (e) => {
     const { query } = e.data;
+    const lowerQuery = query.toLowerCase();
     console.log("Worker received query:", query);
 
     try {
         const db = await openDB(DB_NAME, DB_VERSION);
-        const range = IDBKeyRange.bound(query, query + '\uffff');
-
-        console.log("Range:", range.lower, range.upper);
-        const results = await db.getAllFromIndex(DB_STORES.PATIENTS, 'name', range);
-
-        console.log("Search Results found:", results.length);
+        // Search against the lowercase index
+        const range = IDBKeyRange.bound(lowerQuery, lowerQuery + '\uffff');
+        const results = await db.getAllFromIndex(DB_STORES.PATIENTS, 'name_lowercase', range);
+        
         self.postMessage(results);
 
     } catch (err) {

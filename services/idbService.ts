@@ -10,7 +10,8 @@ export const initDB = async () => {
             }
 
             if (!db.objectStoreNames.contains(DB_STORES.PATIENTS)) {
-                db.createObjectStore(DB_STORES.PATIENTS, { keyPath: 'id' });
+                const patientStore = db.createObjectStore(DB_STORES.PATIENTS, { keyPath: 'id' });
+                patientStore.createIndex('name_lowercase', 'name_lowercase');
             }
 
             if (!db.objectStoreNames.contains(DB_STORES.DOCTORS)) {
@@ -46,9 +47,9 @@ export const seedDatabase = async () => {
     console.log("Seeding initial data...");
 
     const patients: Patient[] = [
-        { id: 'p1', name: 'Irfan', version: 1 },
-        { id: 'p2', name: 'John Doe', version: 1 },
-        { id: 'p3', name: 'Jane Smith', version: 1 },
+        { id: 'p1', name: 'Irfan', version: 1, name_lowercase: 'irfan' },
+        { id: 'p2', name: 'John Doe', version: 1, name_lowercase: 'john doe' },
+        { id: 'p3', name: 'Jane Smith', version: 1, name_lowercase: 'jane smith' },
     ];
 
     const doctors: Doctor[] = [

@@ -1,6 +1,7 @@
 export interface Patient {
     id: string;
     name: string;
+    name_lowercase: string;
     version: number;
 }
 

@@ -1,5 +1,5 @@
 export const DB_NAME = 'schedly_offline_db';
-export const DB_VERSION = 6;
+export const DB_VERSION = 11;
 
 export const DB_STORES = {
     PATIENTS: 'patients',
