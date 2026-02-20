@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { saveAppointment } from '@/services/idbService';
 import { useBroadcastSync } from './useBroadcastSync';
+import { saveAppointment } from '@/services/idbService';
 
 export const useOptimisticAppointment = (initialData: any) => {
   const [appointment, setAppointment] = useState(initialData);

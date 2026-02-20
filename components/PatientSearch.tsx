@@ -1,9 +1,11 @@
+import { useBroadcastSync } from '@/hooks/useBroadcastSync';
 import { Patient } from '@/types/db';
 import { useState, useEffect, useMemo } from 'react';
 
 export const PatientSearch = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Patient[]>([]);
+    const {syncState} = useBroadcastSync();
 
     // Persistent worker instance
     const worker = useMemo(() => 
@@ -21,7 +23,7 @@ export const PatientSearch = () => {
         }, 150);
 
         return () => clearTimeout(timeoutId);
-    }, []);
+    }, [query, worker, syncState]);
 
     return (
         <div className="p-4 border-b">

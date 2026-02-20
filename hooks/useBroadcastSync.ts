@@ -30,7 +30,7 @@ export const useBroadcastSync = () => {
     // 2. Snapshot logic. Return timestamp just to force react to see a change
     const getSnapshot = () => {
         return Date.now().toString();
-    }
+    };
 
     // 3. Notify function. This function "event" got fired whenever we write to IndexedDB
     const notifyOthers = (actionType: string) => {

@@ -1,9 +1,9 @@
 'use client';
 
-import { seedDatabase } from "@/hooks/useIndexedDB";
 import { useEffect } from "react";
 import { PatientSearch } from "./PatientSearch";
 import { Scheduler } from "./Calendar/Scheduler";
+import { seedDatabase } from "@/services/idbService";
 
 export default function HomePage() {
   useEffect(() => {
