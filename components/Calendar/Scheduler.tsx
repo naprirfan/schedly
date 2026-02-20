@@ -8,40 +8,46 @@ import { useCallback, useEffect, useState } from "react";
 
 export const Scheduler = () => {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
-    const { syncState } = useBroadcastSync();
+    const { syncState, notifyOthers } = useBroadcastSync();
 
     const fetchAppointments = useCallback(async () => {
         const db = await initDB();
         const allAppointments = await db.getAll(DB_STORES.APPOINTMENTS);
-        setAppointments(allAppointments)
+
+        const sortedByDate = allAppointments.sort((a, b) => 
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+        setAppointments(sortedByDate);
     }, []);
 
     useEffect(() => {
         fetchAppointments();
-    }, [syncState]);
+    }, [syncState, fetchAppointments]);
 
     return (
-        <div className="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                <div key={day} className="bg-gray-100 p-2 text-center font-bold text-sm">
-                    {day}
-                </div>
-            ))}
-            {appointments.length > 0 ? (
-                appointments.map((apt) => (
-                <div key={apt.id} className="min-h-[150px] bg-white p-3 hover:bg-blue-50 transition-colors cursor-pointer group border-t border-gray-100">
-                    <span className="text-xs text-gray-400 font-mono block mb-1">{apt.date.toString()}</span>
-                    <div className="p-2 bg-blue-100 border-l-4 border-blue-500 rounded text-xs font-medium text-blue-800 shadow-sm">
-                        Patient: {apt.patientName}
-                    <div className="text-[10px] text-blue-600 mt-1">{apt.type || 'General Consultation'}</div>
+        <div className="space-y-4">
+            <div className="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                    <div key={day} className="bg-gray-50 p-3 text-center font-bold text-xs uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                        {day}
                     </div>
-                </div>
-                ))
-            ) : (
-                <div className="col-span-7 bg-white p-10 text-center text-gray-400 italic">
-                    No appointments scheduled.
-                </div>
-            )}
+                ))}
+                
+                {appointments.length > 0 ? (
+                    appointments.map((apt) => (
+                        <div key={apt.id} className="min-h-[120px] bg-white p-2 hover:bg-blue-50 transition-colors cursor-pointer group border-b border-r border-gray-100 last:border-r-0">
+                            <div className="p-2 bg-blue-50 border-l-2 border-blue-400 rounded-sm text-[11px] font-medium text-blue-900 shadow-sm group-hover:bg-blue-100">
+                                {apt.patientName}
+                                <div className="text-[9px] text-blue-500 mt-0.5 italic">{apt.type}</div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-span-7 bg-white p-12 text-center text-gray-400 italic text-sm">
+                        No appointments scheduled for this week.
+                    </div>
+                )}
+            </div>
         </div>
-    )
-}
+    );
+};

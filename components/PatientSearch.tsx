@@ -1,4 +1,7 @@
-import { Patient } from '@/types/db';
+import { APPOINTMENT_SAVED, DB_STORES } from '@/constants/db-config';
+import { useBroadcastSync } from '@/hooks/useBroadcastSync';
+import { initDB } from '@/services/idbService';
+import { Appointment, Patient } from '@/types/db';
 import { useState, useEffect } from 'react';
 
 let searchWorker: Worker | null = null;
@@ -7,6 +10,25 @@ export const PatientSearch = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Patient[]>([]);
     const [isSearching, setIsSearching] = useState(false);
+    const {notifyOthers} = useBroadcastSync();
+
+    const addAppointment = async (patient: Patient) => {
+        const db = await initDB();
+        const newAppointment: Appointment = {
+            id: crypto.randomUUID(),
+            patientId: patient.id,
+            patientName: patient.name,
+            date: new Date(),
+            type: 'Check up',
+            version: 1,
+            doctorId: 'd1',
+            doctorName: 'Dr. Sarah Connor',
+        };
+
+        await db.put(DB_STORES.APPOINTMENTS, newAppointment);
+        
+        notifyOthers(APPOINTMENT_SAVED);
+    };
 
     useEffect(() => {
         if (!searchWorker && typeof window !== 'undefined') {
@@ -93,6 +115,12 @@ export const PatientSearch = () => {
                                 </p>
                                 <p className="text-xs text-gray-500 uppercase tracking-wider">ID: {patient.id}</p>
                             </div>
+                            <button 
+                                onClick={() => addAppointment(patient)}
+                                className="text-xs font-bold text-blue-600 hover:text-blue-800 p-1 px-2 bg-blue-50 rounded"
+                            >
+                                Book new appointment
+                            </button>
                         </li>
                     ))}
                 </ul>

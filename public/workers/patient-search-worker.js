@@ -1,7 +1,7 @@
 import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
 
 const DB_NAME = 'schedly_offline_db';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 const DB_STORES = {
     PATIENTS: 'patients',

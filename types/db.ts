@@ -11,7 +11,7 @@ export interface Doctor {
     version: number;
 }
 
-export type AppointmentType = 'Initial Consultation' | 'Follow-up';
+export type AppointmentType = 'Initial Consultation' | 'Follow-up' | 'Check up';
 export interface Appointment {
     id: string;
     patientId: string;

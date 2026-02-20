@@ -46,7 +46,7 @@ export const seedDatabase = async () => {
     console.log("Seeding initial data...");
 
     const patients: Patient[] = [
-        { id: 'p1', name: 'M. Irfan', version: 1 },
+        { id: 'p1', name: 'Irfan', version: 1 },
         { id: 'p2', name: 'John Doe', version: 1 },
         { id: 'p3', name: 'Jane Smith', version: 1 },
     ];
@@ -57,13 +57,13 @@ export const seedDatabase = async () => {
     ];
 
     const date = new Date();
-    date.setDate(date.getDate() + 1);
+    date.setDate(date.getDate() - 1);
 
     const initialAppointments: Appointment[] = [
         { 
             id: 'a1', 
             patientId: 'p1', 
-            patientName: 'M. Irfan', 
+            patientName: 'Irfan', 
             doctorId: 'd1', 
             doctorName: 'Dr. Sarah Connor',
             date, 
