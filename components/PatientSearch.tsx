@@ -12,20 +12,39 @@ export const PatientSearch = () => {
     const [isSearching, setIsSearching] = useState(false);
     const {notifyOthers} = useBroadcastSync();
 
-    const addAppointment = async (patient: Patient) => {
+    const addAppointment = async (patient: Patient, requestedTime: Date) => {
         const db = await initDB();
+
+        // 1. Start a transaction
+        const tx = db.transaction(DB_STORES.APPOINTMENTS, 'readwrite');
+        const store = tx.objectStore(DB_STORES.APPOINTMENTS);
+
+        // 2. Conflict Detection Logic
+        // Fetch existing appointments for that specific time/date
+        const existing = await store.getAll(); 
+        const isConflicted = existing.some(apt => 
+            apt.date === requestedTime && apt.patientId === patient.id
+        );
+
+        if (isConflicted) {
+            alert(`Warning: ${patient.name} already has an appointment at this time!`);
+            return;
+        }
+
+        // 3. If clear, proceed with save
         const newAppointment: Appointment = {
             id: crypto.randomUUID(),
             patientId: patient.id,
             patientName: patient.name,
-            date: new Date(),
+            date: requestedTime,
             type: 'Check up',
             version: 1,
             doctorId: 'd1',
             doctorName: 'Dr. Sarah Connor',
         };
 
-        await db.put(DB_STORES.APPOINTMENTS, newAppointment);
+        await store.put(newAppointment);
+        await tx.done;
         
         notifyOthers(APPOINTMENT_SAVED);
     };
@@ -116,7 +135,7 @@ export const PatientSearch = () => {
                                 <p className="text-xs text-gray-500 uppercase tracking-wider">ID: {patient.id}</p>
                             </div>
                             <button 
-                                onClick={() => addAppointment(patient)}
+                                onClick={() => addAppointment(patient, new Date())}
                                 className="text-xs font-bold text-blue-600 hover:text-blue-800 p-1 px-2 bg-blue-50 rounded"
                             >
                                 Book new appointment
