@@ -18,7 +18,7 @@ export interface Appointment {
     patientName: string;
     doctorId: string;
     doctorName: string;
-    date: string;
+    date: Date;
     type: AppointmentType;
     version: number;
 }

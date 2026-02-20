@@ -1,28 +1,20 @@
+import { APPOINTMENT_SAVED, DB_NAME, DB_STORES, DB_VERSION } from '@/constants/db-config';
 import { Appointment, Doctor, Patient } from '@/types/db';
 import { openDB } from 'idb';
-
-export const DB_NAME = 'schedly_offline_db';
-export const DB_VERSION = 4;
-
-export const APPOINTMENTS_STORE_NAME = 'appointments';
-export const PATIENTS_STORE_NAME = 'patients';
-export const DOCTORS_STORE_NAME = 'doctors';
-
-export const APPOINTMENT_SAVED = 'APPOINTMENT_SAVED';
 
 export const initDB = async () => {
     return openDB(DB_NAME, DB_VERSION, {
         upgrade(db) {
-            if (!db.objectStoreNames.contains(APPOINTMENTS_STORE_NAME)) {
-                db.createObjectStore(APPOINTMENTS_STORE_NAME, { keyPath: 'id' });
+            if (!db.objectStoreNames.contains(DB_STORES.APPOINTMENTS)) {
+                db.createObjectStore(DB_STORES.APPOINTMENTS, { keyPath: 'id' });
             }
 
-            if (!db.objectStoreNames.contains(PATIENTS_STORE_NAME)) {
-                db.createObjectStore(PATIENTS_STORE_NAME, { keyPath: 'id' });
+            if (!db.objectStoreNames.contains(DB_STORES.PATIENTS)) {
+                db.createObjectStore(DB_STORES.PATIENTS, { keyPath: 'id' });
             }
 
-            if (!db.objectStoreNames.contains(DOCTORS_STORE_NAME)) {
-                db.createObjectStore(DOCTORS_STORE_NAME, { keyPath: 'id' });
+            if (!db.objectStoreNames.contains(DB_STORES.DOCTORS)) {
+                db.createObjectStore(DB_STORES.DOCTORS, { keyPath: 'id' });
             }
         }
     });
@@ -32,7 +24,7 @@ export const saveAppointment = async (appointment: Appointment, notify: (action:
     const db = await initDB();
 
     // Start an atomic transaction
-    const trx = db.transaction(APPOINTMENTS_STORE_NAME, 'readwrite');
+    const trx = db.transaction(DB_STORES.APPOINTMENTS, 'readwrite');
     try {
         await trx.store.put(appointment);
         await trx.done;
@@ -48,7 +40,7 @@ export const seedDatabase = async () => {
     const db = await initDB();
 
     // Check if we already have data to avoid duplicate seeding
-    const existingPatients = await db.count(PATIENTS_STORE_NAME);
+    const existingPatients = await db.count(DB_STORES.PATIENTS);
     if (existingPatients > 0) return; 
 
     console.log("Seeding initial data...");
@@ -64,6 +56,9 @@ export const seedDatabase = async () => {
         { id: 'd2', name: 'Dr. Joel Miller', specialty: 'Osteopathy', version: 1 },
     ];
 
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+
     const initialAppointments: Appointment[] = [
         { 
             id: 'a1', 
@@ -71,7 +66,7 @@ export const seedDatabase = async () => {
             patientName: 'M. Irfan', 
             doctorId: 'd1', 
             doctorName: 'Dr. Sarah Connor',
-            date: '09:00 AM', 
+            date, 
             type: 'Initial Consultation',
             version: 1,
         },
@@ -82,20 +77,20 @@ export const seedDatabase = async () => {
             doctorName: 'Dr. Joel Miller',
             doctorId: 'd2', 
             type: 'Follow-up',
-            date: '2026-02-20',
+            date,
             version: 1,
         }
     ];
 
     // Multi-store transaction for data integrity
     const tx = db.transaction(
-        [PATIENTS_STORE_NAME, DOCTORS_STORE_NAME, APPOINTMENTS_STORE_NAME], 
+        [DB_STORES.PATIENTS, DB_STORES.DOCTORS, DB_STORES.APPOINTMENTS], 
         'readwrite'
     );
 
-    const pStore = tx.objectStore(PATIENTS_STORE_NAME);
-    const dStore = tx.objectStore(DOCTORS_STORE_NAME);
-    const aStore = tx.objectStore(APPOINTMENTS_STORE_NAME);
+    const pStore = tx.objectStore(DB_STORES.PATIENTS);
+    const dStore = tx.objectStore(DB_STORES.DOCTORS);
+    const aStore = tx.objectStore(DB_STORES.APPOINTMENTS);
 
     for (const p of patients) await pStore.put(p);
     for (const d of doctors) await dStore.put(d);

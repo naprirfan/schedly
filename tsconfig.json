@@ -30,6 +30,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "public/workers/*.js"  
-  ],
+  , "constants/*.ts"  ],
   "exclude": ["node_modules"]
 }

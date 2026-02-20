@@ -1,8 +1,13 @@
 import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
 
 const DB_NAME = 'schedly_offline_db';
-const DB_VERSION = 4;
-const PATIENTS_STORE_NAME = 'patients';
+const DB_VERSION = 5;
+
+const DB_STORES = {
+    PATIENTS: 'patients',
+    APPOINTMENTS: 'appointments',
+    DOCTORS: 'doctors',
+};
 
 self.onmessage = async (e) => {
     const { query } = e.data;
@@ -13,7 +18,7 @@ self.onmessage = async (e) => {
         const range = IDBKeyRange.bound(query, query + '\uffff');
 
         console.log("Range:", range.lower, range.upper);
-        const results = await db.getAllFromIndex(PATIENTS_STORE_NAME, 'name', range);
+        const results = await db.getAllFromIndex(DB_STORES.PATIENTS, 'name', range);
 
         console.log("Search Results found:", results.length);
         self.postMessage(results);
@@ -21,5 +26,4 @@ self.onmessage = async (e) => {
     } catch (err) {
         console.error("Worker Search Error:", err);
     }
-
 };
