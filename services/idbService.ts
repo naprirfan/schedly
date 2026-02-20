@@ -1,7 +1,7 @@
-import { openDB, IDBPDatabase } from 'idb';
+import { openDB } from 'idb';
 
-const DB_NAME = 'schedly_offline_db';
-const STORE_NAME = 'appointments';
+export const DB_NAME = 'schedly_offline_db';
+export const STORE_NAME = 'appointments';
 
 export const APPOINTMENT_SAVED = 'APPOINTMENT_SAVED';
 
