@@ -1,8 +1,8 @@
-import { Appointment, Patient } from '@/types/db';
+import { Appointment, Doctor, Patient } from '@/types/db';
 import { openDB } from 'idb';
 
 export const DB_NAME = 'schedly_offline_db';
-export const DB_VERSION = 3;
+export const DB_VERSION = 4;
 
 export const APPOINTMENTS_STORE_NAME = 'appointments';
 export const PATIENTS_STORE_NAME = 'patients';
@@ -53,35 +53,37 @@ export const seedDatabase = async () => {
 
     console.log("Seeding initial data...");
 
-    const patients = [
+    const patients: Patient[] = [
         { id: 'p1', name: 'M. Irfan', version: 1 },
         { id: 'p2', name: 'John Doe', version: 1 },
         { id: 'p3', name: 'Jane Smith', version: 1 },
     ];
 
-    const doctors = [
-        { id: 'd1', name: 'Dr. Sarah Connor', specialty: 'Physiotherapy' },
-        { id: 'd2', name: 'Dr. Joel Miller', specialty: 'Osteopathy' },
+    const doctors: Doctor[] = [
+        { id: 'd1', name: 'Dr. Sarah Connor', specialty: 'Physiotherapy', version: 1 },
+        { id: 'd2', name: 'Dr. Joel Miller', specialty: 'Osteopathy', version: 1 },
     ];
 
-    const initialAppointments = [
+    const initialAppointments: Appointment[] = [
         { 
             id: 'a1', 
             patientId: 'p1', 
             patientName: 'M. Irfan', 
             doctorId: 'd1', 
-            time: '09:00 AM', 
+            doctorName: 'Dr. Sarah Connor',
+            date: '09:00 AM', 
             type: 'Initial Consultation',
-            date: '2026-02-20' 
+            version: 1,
         },
         { 
             id: 'a2', 
             patientId: 'p2', 
             patientName: 'John Doe', 
+            doctorName: 'Dr. Joel Miller',
             doctorId: 'd2', 
-            time: '11:30 AM', 
             type: 'Follow-up',
-            date: '2026-02-20' 
+            date: '2026-02-20',
+            version: 1,
         }
     ];
 

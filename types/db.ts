@@ -7,12 +7,18 @@ export interface Patient {
 export interface Doctor {
     id: string;
     name: string;
+    specialty: string;
     version: number;
 }
 
+export type AppointmentType = 'Initial Consultation' | 'Follow-up';
 export interface Appointment {
     id: string;
     patientId: string;
+    patientName: string;
     doctorId: string;
+    doctorName: string;
+    date: string;
+    type: AppointmentType;
     version: number;
 }

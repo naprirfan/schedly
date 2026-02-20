@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useBroadcastSync } from './useBroadcastSync';
 import { saveAppointment } from '@/services/idbService';
+import { Appointment } from '@/types/db';
 
-export const useOptimisticAppointment = (initialData: any) => {
-  const [appointment, setAppointment] = useState(initialData);
+export const useOptimisticAppointment = (initialData: Appointment) => {
+  const [appointment, setAppointment] = useState<Appointment>(initialData);
   const { notifyOthers } = useBroadcastSync();
 
-  const updateAppointment = async (newData: any) => {
+  const updateAppointment = async (newData: Appointment) => {
     // 1. For rollback
     const previousState = { ...appointment };
 

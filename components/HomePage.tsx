@@ -7,7 +7,6 @@ import { seedDatabase } from "@/services/idbService";
 
 export default function HomePage() {
   useEffect(() => {
-    // Seed on first load for demo purposes
     seedDatabase();
   }, []);
 
