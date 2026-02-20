@@ -1,29 +1,44 @@
 import { useBroadcastSync } from '@/hooks/useBroadcastSync';
 import { Patient } from '@/types/db';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+
+let searchWorker: Worker | null = null;
 
 export const PatientSearch = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Patient[]>([]);
     const {syncState} = useBroadcastSync();
 
-    // Persistent worker instance
-    const worker = useMemo(() => 
-        typeof window !== 'undefined' ? new Worker('/worker/patient-search-worker.js') : null
-    , []);
+    useEffect(() => {
+        if (!searchWorker && typeof window !== 'undefined') {
+            console.log("Initializing Singleton Worker...");
+            searchWorker = new Worker('/workers/patient-search-worker.js', {
+                type: 'module'
+            });
+        }
+
+        if (searchWorker) {
+            searchWorker.onmessage = (e) => {
+                console.log("Main thread received results:", e.data);
+                setResults(e.data);
+            };
+
+            searchWorker.onerror = (err) => {
+                console.error("Worker Error details:", err);
+            };
+        }
+    }, []);
 
     useEffect(() => {
-        if (!worker) return;
-
-        worker.onmessage = e => setResults(e.data);
-
-        // Debounce search to 150ms
         const timeoutId = setTimeout(() => {
-            if (query.length >= 2) worker.postMessage({ query });
-        }, 150);
+            if (query.length >= 2 && searchWorker) {
+                console.log("Posting message to worker:", query);
+                searchWorker.postMessage({ query });
+            }
+        }, 300);
 
         return () => clearTimeout(timeoutId);
-    }, [query, worker, syncState]);
+    }, [query]);
 
     return (
         <div className="p-4 border-b">

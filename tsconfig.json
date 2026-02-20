@@ -28,7 +28,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
-, "workers/patient-search-worker.js"  ],
+    "**/*.mts",
+    "public/workers/*.js"  
+  ],
   "exclude": ["node_modules"]
 }
