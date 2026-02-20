@@ -17,6 +17,10 @@ export const initDB = async () => {
             if (!db.objectStoreNames.contains(DB_STORES.DOCTORS)) {
                 db.createObjectStore(DB_STORES.DOCTORS, { keyPath: 'id' });
             }
+
+            if (!db.objectStoreNames.contains(DB_STORES.NOTES)) {
+                db.createObjectStore(DB_STORES.NOTES, { keyPath: 'id' });
+            }
         }
     });
 }

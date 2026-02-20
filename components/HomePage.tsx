@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from "react";
-import { PatientSearch } from "./PatientSearch";
+import { PatientSearch } from "./Patient/PatientSearch";
 import { Scheduler } from "./Calendar/Scheduler";
 import { seedDatabase } from "@/services/idbService";
 

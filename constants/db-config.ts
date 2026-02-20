@@ -1,10 +1,11 @@
 export const DB_NAME = 'schedly_offline_db';
-export const DB_VERSION = 11;
+export const DB_VERSION = 12;
 
 export const DB_STORES = {
     PATIENTS: 'patients',
     APPOINTMENTS: 'appointments',
     DOCTORS: 'doctors',
+    NOTES: 'notes',
 } as const;
 
 export const SYNC_CHANNEL = 'schedly_sync_channel';
