@@ -1,4 +1,3 @@
-import { useBroadcastSync } from '@/hooks/useBroadcastSync';
 import { Patient } from '@/types/db';
 import { useState, useEffect } from 'react';
 
@@ -7,7 +6,7 @@ let searchWorker: Worker | null = null;
 export const PatientSearch = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Patient[]>([]);
-    const {syncState} = useBroadcastSync();
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         if (!searchWorker && typeof window !== 'undefined') {
@@ -21,15 +20,25 @@ export const PatientSearch = () => {
             searchWorker.onmessage = (e) => {
                 console.log("Main thread received results:", e.data);
                 setResults(e.data);
+                setIsSearching(false);
             };
 
             searchWorker.onerror = (err) => {
                 console.error("Worker Error details:", err);
+                setIsSearching(false);
             };
         }
     }, []);
 
     useEffect(() => {
+        if (query.length < 2) {
+            setResults([]);
+            setIsSearching(false);
+            return;
+        }
+
+        setIsSearching(true);
+
         const timeoutId = setTimeout(() => {
             if (query.length >= 2 && searchWorker) {
                 console.log("Posting message to worker:", query);
@@ -40,17 +49,60 @@ export const PatientSearch = () => {
         return () => clearTimeout(timeoutId);
     }, [query]);
 
+    const highlightMatch = (text: string, term: string) => {
+        if (!term) return text;
+        const parts = text.split(new RegExp(`(${term})`, 'gi'));
+        return (
+            <span>
+                {parts.map((part, i) => 
+                    part.toLowerCase() === term.toLowerCase() 
+                        ? <mark key={i} className="bg-yellow-200 text-yellow-900 rounded-sm px-0.5">{part}</mark> 
+                        : part
+                )}
+            </span>
+        );
+    };
+
     return (
-        <div className="p-4 border-b">
-            <input 
-                type="text" 
-                placeholder="Search patients (e.g. 'Jo')..."
-                className="w-full p-2 border rounded shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                onChange={(e) => setQuery(e.target.value)}
-            />
-            <ul className="mt-2 space-y-1">
-                {results.map(p => <li key={p.id} className="text-sm p-1 hover:bg-gray-100">{p.name}</li>)}
-            </ul>
+        <div className="relative w-full max-w-md mx-auto">
+            <div className="relative">
+                <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search patients (e.g. John)..."
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                />
+                {isSearching && (
+                    <div className="absolute right-3 top-2.5">
+                        <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                    </div>
+                )}
+            </div>
+
+            {results.length > 0 && (
+                <ul className="absolute z-10 w-full mt-2 bg-white border rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+                    {results.map((patient) => (
+                        <li 
+                            key={patient.id} 
+                            className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b last:border-none flex justify-between items-center"
+                        >
+                            <div>
+                                <p className="text-sm font-semibold text-gray-800">
+                                    {highlightMatch(patient.name, query)}
+                                </p>
+                                <p className="text-xs text-gray-500 uppercase tracking-wider">ID: {patient.id}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {query.length >= 2 && !isSearching && results.length === 0 && (
+                <div className="absolute z-10 w-full mt-2 bg-white p-4 border rounded-lg shadow-lg text-center text-gray-500 italic text-sm">
+                    No patients found matching "{query}"
+                </div>
+            )}
         </div>
-    )
+    );
 }
