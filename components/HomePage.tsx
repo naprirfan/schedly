@@ -13,14 +13,6 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        <header className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-blue-900">Schedly Practice Manager</h1>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-            <span className="text-sm font-medium text-gray-600">Offline-First Active</span>
-          </div>
-        </header>
-
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <aside className="lg:col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <PatientSearch />
