@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export const Scheduler = () => {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
-    const { syncState, notifyOthers } = useBroadcastSync();
+    const { syncState } = useBroadcastSync();
 
     const fetchAppointments = useCallback(async () => {
         const db = await initDB();

@@ -1,3 +1,5 @@
-export function PatientList() {
-    return <div>Patient list</div>
+import PatientList from "./PatientList";
+
+export default function PatientListPage() {
+    return <PatientList />;
 }
