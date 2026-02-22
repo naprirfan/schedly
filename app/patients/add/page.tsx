@@ -1,3 +1,5 @@
-export function PatientAdd() {
-    return <div>Patient Add Form</div>
+import { PatientAdd } from "./PatientAdd";
+
+export default function PatientAddPage() {
+    return <PatientAdd />
 }

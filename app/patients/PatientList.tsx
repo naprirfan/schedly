@@ -28,6 +28,7 @@ export default function PatientList() {
     }, [syncState, fetchPatients]);
 
     if (loading) return <div>Loading...</div>
+    
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
