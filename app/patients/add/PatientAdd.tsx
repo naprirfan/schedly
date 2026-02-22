@@ -2,13 +2,28 @@
 
 import { DataForm } from "@/components/Shared/DataForm";
 import { PATIENT_FIELDS } from "@/components/Shared/form-fields";
+import { DB_STORES } from "@/constants/db-config";
+import { useOptimisticStore } from "@/hooks/useOptimisticStore";
 import { Patient } from "@/types/db";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export function PatientAdd() {
+    const router = useRouter();
+
+    const { updateEntry } = useOptimisticStore(DB_STORES.PATIENTS, {} as Patient);
+
     const handleSave = async (updatedPatient: Patient) => {
         try {
-            // await updateEntry(updatedPatient);
+            const newPatient: Patient = {
+                ...updatedPatient,
+                id: crypto.randomUUID(),
+                name_lowercase: updatedPatient.name.toLowerCase(),
+                version: 1,
+            }
+            await updateEntry(newPatient);
             alert("Saved successfully!");
+            router.push('/patients');
         } catch (e) {
             alert("Failed to save. Check storage permissions.");
         }

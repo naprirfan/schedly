@@ -6,7 +6,7 @@ interface DataTableProps<T> {
 
 export function DataTable<T extends { id: string | number }>({ data, columns, onViewDetail }: DataTableProps<T>) {
     return (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="w-full text-left bg-white">
                 <thead className="bg-gray-50 border-b">
                     <tr>
