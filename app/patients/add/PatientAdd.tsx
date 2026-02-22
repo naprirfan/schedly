@@ -6,7 +6,6 @@ import { DB_STORES } from "@/constants/db-config";
 import { useOptimisticStore } from "@/hooks/useOptimisticStore";
 import { Patient } from "@/types/db";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export function PatientAdd() {
     const router = useRouter();
@@ -19,7 +18,7 @@ export function PatientAdd() {
                 ...updatedPatient,
                 id: crypto.randomUUID(),
                 name_lowercase: updatedPatient.name.toLowerCase(),
-                version: 1,
+                version: 0,
             }
             await updateEntry(newPatient);
             alert("Saved successfully!");

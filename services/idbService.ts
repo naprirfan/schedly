@@ -25,22 +25,6 @@ export const initDB = async () => {
     });
 }
 
-export const saveAppointment = async (appointment: Appointment, notify: (action: string) => void) => {
-    const db = await initDB();
-
-    // Start an atomic transaction
-    const trx = db.transaction(DB_STORES.APPOINTMENTS, 'readwrite');
-    try {
-        await trx.store.put(appointment);
-        await trx.done;
-
-        // Triggers sync accross tabs
-        notify(APPOINTMENT_SAVED);
-    } catch (err) {
-        console.error('Failed to save appointment. Transaction rolled back', err);
-    }
-}
-
 export const seedDatabase = async () => {
     const db = await initDB();
 

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useBroadcastSync } from './useBroadcastSync';
 import { initDB } from '@/services/idbService';
 
-export function useOptimisticStore<T extends { id: string | number }>(
+export function useOptimisticStore<T extends { id: string | number; version: number }>(
   storeName: string, 
   initialData: T
 ) {
@@ -13,22 +13,49 @@ export function useOptimisticStore<T extends { id: string | number }>(
   const updateEntry = async (newData: T) => {
     const previousState = { ...data };
     
-    // 1. Optimistic Update
+    // 1. UI Optimism: Update local state immediately for perceived speed
     setData(newData);
 
     try {
-      // 2. Persist to IndexedDB
       const db = await initDB();
-      await db.put(storeName, newData);
       
-      // 3. Sync other tabs
+      // 2. Conflict Detection (The Guard)
+      const existingRecord = await db.get(storeName, newData.id);
+      
+      if (existingRecord && existingRecord.version > previousState.version) {
+          // A newer version exists in the DB (likely from another tab/sync)
+          alert('Conflict detected');
+          throw new Error('CONFLICT_DETECTED');
+      }
+
+      // 3. Prepare Final Record
+      const recordWithNewVersion = {
+          ...newData,
+          version: (existingRecord?.version || 0) + 1,
+          updatedAt: new Date().toISOString()
+      };
+
+      // 4. Actual Persistence
+      await db.put(storeName, recordWithNewVersion);
+      
+      // Update local state one last time with the server-side version
+      setData(recordWithNewVersion);
+
+      // 5. Global Sync
       notifyOthers(`${storeName.toUpperCase()}_UPDATED`);
+      
     } catch (error) {
-      console.error(`Update to ${storeName} failed, rolling back`, error);
+      // 6. Rollback
       setData(previousState);
-      throw error; // Let the UI handle the error state/toast
+      
+      if (error instanceof Error && error.message === 'CONFLICT_DETECTED') {
+          console.warn("Version mismatch! Rolling back to latest known state.");
+          // Trigger a re-fetch or alert the user
+      }
+      
+      throw error; 
     }
   };
 
   return { data, updateEntry };
-};
+}
