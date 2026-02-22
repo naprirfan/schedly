@@ -2,6 +2,7 @@ export interface Patient {
     id: string;
     name: string;
     name_lowercase: string;
+    treatment?: string;
     version: number;
 }
 

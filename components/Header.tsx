@@ -31,16 +31,7 @@ const Header = () => {
                         <Link className="underline mr-4" href="/">Home</Link>
                     </li>
                     <li>
-                        <Link className="underline mr-4" href="/appointment">Appointments</Link>
-                    </li>
-                    <li>
                         <Link className="underline mr-4" href="/patients">Patients</Link>
-                    </li>
-                    <li>
-                        <Link className="underline mr-4" href="/doctors">Doctors</Link>
-                    </li>
-                    <li>
-                        <Link className="underline mr-4" href="/notes">Notes</Link>
                     </li>
                 </ol>
             </nav>
